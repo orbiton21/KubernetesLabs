@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 08-hpa
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hpa-demo-lb
+  namespace: 08-hpa
+spec:
+  externalTrafficPolicy: Local
+  ports:
+  - name: port-80
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: "443"
+    port: 443
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nginx
+  sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: 08-hpa
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx
+  namespace: 08-hpa
+spec:
+  maxReplicas: 10
+  metrics:
+  - object:
+      metricName: requests-per-second
+      target:
+        apiVersion: extensions/v1beta1
+        kind: Ingress
+        name: hpa-demo-lb
+      targetValue: "1"
+    type: Object
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1beta1
+    kind: Deployment
+    name: nginx
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: php-apache
+    prometheus: kube-prometheus
+    role: alert-rules
+    run: php-apache
+  name: php-apache
+  namespace: 08-hpa
+spec:
+  groups:
+  - interval: 10s
+    name: hpa
+    rules:
+    - expr: avg(rabbitmq_queue_messages{queue=~"epm-ti-hash-request-arielpriority"})
+      record: hpa_custom_metrics_deployment_queues_length

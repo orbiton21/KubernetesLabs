@@ -1,0 +1,7 @@
+namespace: 08-hpa
+resources:
+- namespace.yaml
+- service.yaml
+- deployment.yaml
+- hpa.yaml
+- premetheosRule.yaml

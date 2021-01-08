@@ -1,0 +1,8 @@
+# 
+# This docker file will load a kubespray container
+# 
+# Darumatic container for using kubespray
+# Use imutable image tags rather than mutable tags (like ubuntu:18.04)
+FROM centos:7.6.1810
+
+RUN yum update

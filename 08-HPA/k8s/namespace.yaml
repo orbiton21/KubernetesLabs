@@ -1,0 +1,6 @@
+# First define the desired namespace
+apiVersion: v1
+kind: Namespace
+metadata: 
+  name: 08-hpa
+

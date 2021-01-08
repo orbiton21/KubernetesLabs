@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: php-apache
+  namespace: default   
+  labels:
+    prometheus: kube-prometheus
+    role: alert-rules
+    run: php-apache
+    app: php-apache
+spec:
+  groups:
+  - name: hpa
+    interval: 10s
+    rules:
+    - expr: 'avg(rabbitmq_queue_messages{queue=~"epm-ti-hash-request-arielpriority"})'
+      record: hpa_custom_metrics_deployment_queues_length

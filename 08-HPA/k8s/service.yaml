@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: hpa-demo-lb
+spec:
+  ports:
+    - name: port-80
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: '443'
+      protocol: TCP
+      port: 443
+      targetPort: 80
+  selector:
+    app: nginx
+  type: LoadBalancer
+  sessionAffinity: None
+  externalTrafficPolicy: Local

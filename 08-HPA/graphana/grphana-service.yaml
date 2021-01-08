@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app: grafana
+spec:
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  selector:
+    app: grafana
+  type: LoadBalancer
+  sessionAffinity: None
+  externalTrafficPolicy: Local
